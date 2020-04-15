@@ -1,0 +1,43 @@
+- name: allow binding non-local IP
+  sysctl:
+    name: net.ipv4.ip_nonlocal_bind
+    value: "1"
+    reload: true
+    state: present
+
+- name: allow IP forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    reload: true
+    state: present
+
+- name: copy check scripts
+  copy:
+    src: "files/{{ item }}"
+    dest: "/etc/keepalived/"
+    mode: 0755
+    owner: root
+    group: root
+  with_items:
+    - check_port_available.sh
+    - check_primary_running.sh
+    - notify.sh
+
+- name: install keepalived config
+  template:
+    src: "keepalived.conf.j2"
+    dest: "{{ keepalived_conf_dir }}/keepalived.conf"
+    mode: 0644
+    owner: root
+  with_items: "{{ groups['k3s-nodes'] }}"
+  when: hostvars[item]['inventory_hostname'] != inventory_hostname
+  vars:
+    unicast_peer: "{{ hostvars[item]['private_ip'] }}"
+  notify: restart keepalived
+
+- name: enable and start keepalived
+  service:
+    name: keepalived
+    state: started
+    enabled: yes

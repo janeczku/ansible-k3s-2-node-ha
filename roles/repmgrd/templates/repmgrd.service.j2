@@ -1,0 +1,19 @@
+[Unit]
+Description=repmgrd
+After=syslog.target
+After=network.target
+
+[Service]
+Type=forking
+Restart=on-failure
+RestartSec=10
+User=postgres
+Group=postgres
+TimeoutStopSec=5
+ExecStart={{ repmgrd_bin }} -d --config-file {{ repmgrd_config }} --pid-file={{ repmgrd_pid }}
+StandardOutput=syslog
+StandardError=syslog
+PIDFile={{ repmgrd_pid }}
+
+[Install]
+WantedBy=multi-user.target

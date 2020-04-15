@@ -1,0 +1,11 @@
+listen_addresses = '*'
+port = 5432
+max_wal_senders = 5
+wal_keep_segments = 5
+wal_level = replica
+fsync = on
+hot_standby = on
+wal_log_hints = on
+archive_mode = on
+archive_command = '/bin/true'
+shared_preload_libraries = 'repmgr'

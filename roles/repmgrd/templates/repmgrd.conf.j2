@@ -1,0 +1,31 @@
+node_id={{ psql_id }}
+node_name={{ inventory_hostname }}
+conninfo='host={{ ansible_host }} user=repmgr dbname=repmgr connect_timeout=2'
+data_directory='{{ pg_data_dir }}'
+pg_bindir='{{ pg_bin_dir }}'
+reconnect_attempts=3
+reconnect_interval=2
+priority={{ psql_node_priority }}
+
+service_start_command='sudo pg_ctlcluster 11 main start'
+service_stop_command='sudo pg_ctlcluster 11 main stop'
+service_restart_command='sudo pg_ctlcluster 11 main restart'
+service_reload_command='sudo pg_ctlcluster 11 main reload'
+
+log_facility=LOCAL0
+log_level=INFO
+
+failover=automatic
+promote_command='repmgr standby promote -f {{ repmgrd_config }} --log-to-file --log-level=DEBUG --verbose'
+follow_command='repmgr standby follow -f {{ repmgrd_config }} --log-to-file --log-level=DEBUG --verbose'
+
+event_notification_command='/usr/local/bin/psql-bouncer %n %e %s "%t" "%d"'
+
+ssh_options='-o "StrictHostKeyChecking no" -v'
+use_replication_slots=1
+
+monitoring_history=yes
+monitor_interval_secs=5
+
+# TODO: Is this needed?
+# service_promote_command='{{ pg_bin_dir }}/pg_ctl -w -D {{ pg_data_dir }} promote'

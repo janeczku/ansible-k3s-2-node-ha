@@ -1,0 +1,40 @@
+- name: update pg_hba.conf
+  blockinfile:
+    dest: "{{ pg_hba_file }}"
+    block:  |
+      host {{ k3s_psql_db }} {{ k3s_psql_user }} {{ hostvars[groups['k3s-nodes'][0]].private_ip }}/32 md5
+      host {{ k3s_psql_db }} {{ k3s_psql_user }} {{ hostvars[groups['k3s-nodes'][1]].private_ip }}/32 md5
+      host {{ k3s_psql_db }} {{ k3s_psql_user }} {{ keepalived_virtual_ip }}/32 md5
+    insertbefore: BOF
+    marker: "# {mark} ANSIBLE MANAGED BLOCK FOR K3s"
+  notify: reload postgresql
+
+- name: Install Dependencies (rhel/centos)
+  yum:
+    name: "python3-psycopg2"
+    state: present
+  when:
+    - ansible_os_family == "RedHat"
+    - psql_master == True
+
+- name: Install Dependencies (debian/ubuntu)
+  apt: 
+    name: "python3-psycopg2"
+    state: latest
+  when: 
+    - ansible_os_family == "Debian"
+    - psql_master == True
+
+- name: Create k3s database
+  postgresql_db: name={{ k3s_psql_db }} encoding=UTF-8
+  become_user: postgres
+  become: yes
+  when:
+    - psql_master == True
+
+- name: Create k3s user
+  postgresql_user: db={{ k3s_psql_db }} name={{ k3s_psql_user }} password={{ k3s_psql_password }} priv=ALL
+  become: yes
+  become_user: postgres
+  when:
+    - psql_master == True

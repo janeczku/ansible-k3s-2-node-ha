@@ -1,0 +1,4 @@
+- name: install postgresql
+  package: name="postgresql-{{ pg_version }}" state=present
+  notify:
+    - restart postgresql

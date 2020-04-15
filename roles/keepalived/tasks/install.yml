@@ -1,0 +1,13 @@
+- name: Install keepalived (rhel/centos)
+  yum:
+    name: "{{ keepalived_package_name }}"
+    state: present
+  when: ansible_os_family == "RedHat"
+  notify: restart keepalived
+
+- name: Install keepalived (debian/ubuntu)
+  apt: 
+    name: "{{ keepalived_package_name }}"
+    state: latest
+  when: ansible_os_family == "Debian"
+  notify: restart keepalived

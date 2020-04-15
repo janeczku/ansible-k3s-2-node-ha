@@ -1,0 +1,38 @@
+- name: set master priority
+  set_fact:
+    psql_node_priority: '110'
+  when: 
+    - psql_master == True
+
+- name: set standby priority
+  set_fact:
+    psql_node_priority: '100'
+  when: 
+    - psql_master == False
+
+- name: configure postgres sudoers
+  copy: src=pg_sudoers dest="/etc/sudoers.d/pg_sudoers"
+
+- name: update pg_hba.conf
+  blockinfile:
+    dest: "{{ pg_hba_file }}"
+    block: "{{ lookup('template', 'pg_hba.conf.j2') }}"
+    insertbefore: BOF
+    marker: "# {mark} ANSIBLE MANAGED BLOCK FOR REPMGR"
+
+- name: install postgres config
+  template: src=pg_repmgr.conf.j2 dest="{{ pg_confd_dir }}/pg_repmgr.conf" mode=0644 owner=postgres
+
+- name: install repmgrd config
+  template: src=repmgrd.conf.j2 dest="{{ repmgrd_config }}" mode=0644
+
+- name: install repmgr pgpass
+  template: src=pgpass.j2 dest="~/.pgpass" mode=0600 owner=postgres
+  become: true
+  become_user: postgres
+
+- name: install repmgrd service
+  template: src=repmgrd.service.j2 dest="{{ repmgrd_service }}"
+
+- name: restart postgres
+  service: name=postgresql daemon_reload=yes state=restarted enabled=yes

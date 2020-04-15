@@ -1,0 +1,8 @@
+- name: add key
+  apt_key: url=https://apt.2ndquadrant.com/site/keys/9904CD4BD6BAF0C3.asc state=present
+
+- name: install apt-transport-https
+  package: name=apt-transport-https state=present
+
+- name: add repo
+  apt_repository: repo="deb http://apt.2ndquadrant.com/ {{ ansible_distribution_release }}-2ndquadrant main"

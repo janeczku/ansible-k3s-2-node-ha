@@ -1,0 +1,3 @@
+Cmnd_Alias POSTGRES_CMDS = /sbin/iptables, /usr/bin/pg_ctlcluster
+Defaults:postgres !requiretty
+postgres ALL=(ALL) NOPASSWD: POSTGRES_CMDS

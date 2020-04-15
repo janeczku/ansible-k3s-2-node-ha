@@ -1,0 +1,8 @@
+k3s_version: v1.17.4+k3s1
+k3s_x64_sha256: 60f36c6aa9d0d2c6b80e0673e0fdf53fb73441c0f6b82a9d0a58eed132beca32
+k3s_arm64_sha256: a49d76c45ca6b0dd904b54cd1d75603dd402cddfe6e1f2d3ae1f092dab3b4191
+k3s_psql_db: k3s
+k3s_psql_user: k3s
+k3s_psql_password: changeme
+k3s_cluster_token: changeme
+k3s_systemd_dir: /etc/systemd/system

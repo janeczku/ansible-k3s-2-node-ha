@@ -1,0 +1,2 @@
+- include: install-db.yml
+- include: install-k3s.yml

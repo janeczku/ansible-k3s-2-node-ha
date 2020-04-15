@@ -1,0 +1,29 @@
+- block:
+  - name: create repmgr db user
+    command: createuser -s repmgr
+    become: true
+    become_user: postgres
+
+  - name: change repmgr password
+    command: psql -c "alter user repmgr with password '{{ repmgr_db_user_pass }}';"
+    become: true
+    become_user: postgres
+
+  - name: create repmgr role
+    command: createdb repmgr -O repmgr
+    become: true
+    become_user: postgres
+
+  - name: alter repmgr db user
+    command: psql -c 'alter user repmgr set search_path TO repmgr, "$user", public;'
+    become: true
+    become_user: postgres
+  ignore_errors: yes
+
+- name: register master
+  command: repmgr -f {{ repmgrd_config }} primary register --force
+  register: repmgr_log
+  become: true
+  become_user: postgres
+  notify:
+    - save repmgr log

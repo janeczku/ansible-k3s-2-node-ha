@@ -1,0 +1,2 @@
+keepalived_package_name: "keepalived"
+keepalived_conf_dir: "/etc/keepalived"

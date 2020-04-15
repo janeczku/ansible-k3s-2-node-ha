@@ -1,0 +1,15 @@
+- name: install sudo
+  package: name=sudo state=present
+
+- name: install repmgr
+  package: name="postgresql-{{ pg_version }}-repmgr" state=present
+
+- name: Create tempfiles configuration for repmgr TODO
+  blockinfile:
+    dest: /usr/lib/tmpfiles.d/repmgrd.conf
+    create: yes
+    block: |
+      d /run/repmgr 2775 postgres postgres -
+
+- name: Create temp dir TODO
+  command: systemd-tmpfiles --create

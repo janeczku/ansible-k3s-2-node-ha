@@ -1,0 +1,20 @@
+- include: add_repo.yml
+- include: install.yml
+- include: setup.yml
+- include: ssh_keys.yml
+
+- stat: path="/etc/repmgr_init.log"
+  register: repmgr_log_stat
+
+- include: master.yml
+  when: 
+    - psql_master == True
+    - repmgr_log_stat.stat.exists == False
+
+- include: standby.yml
+  when:
+    - psql_master == False
+    - repmgr_log_stat.stat.exists == False
+
+- name: restart repmgrd
+  service: name="{{ repmgrd_service_name }}" daemon_reload=yes state=restarted enabled=yes

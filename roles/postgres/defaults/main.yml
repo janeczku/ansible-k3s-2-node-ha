@@ -1,0 +1,5 @@
+pg_version: 11
+pg_hba_file: "/etc/postgresql/{{ pg_version }}/main/pg_hba.conf"
+pg_confd_dir: "/etc/postgresql/{{ pg_version }}/main/conf.d/"
+pg_data_dir: "/var/lib/postgresql/{{ pg_version }}/main/"
+pg_bin_dir: "/usr/lib/postgresql/{{ pg_version }}/bin/"

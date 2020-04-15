@@ -1,0 +1,7 @@
+[k3s-nodes]
+jan-ha-01 ansible_host=172.16.133.76 psql_id=1 psql_master=True private_ip=172.16.133.76
+jan-ha-02 ansible_host=172.16.133.213 psql_id=2 psql_master=False private_ip=172.16.133.213
+
+[all:vars]
+ansible_connection=ssh
+ansible_user=ubuntu

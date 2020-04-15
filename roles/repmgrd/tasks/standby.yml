@@ -1,0 +1,21 @@
+- name: stop postgres
+  service: name=postgresql state=stopped
+
+- name: remove pg data
+  file: path="{{ pg_data_dir }}/*" state=absent
+
+- name: cloning db
+  command: repmgr -h {{ hostvars[groups['k3s-nodes'][0]]['ansible_host'] }} -U repmgr -d repmgr -f {{ repmgrd_config }} standby clone -F
+  become: true
+  become_user: postgres
+
+- name: start postgres
+  service: name=postgresql state=started
+
+- name: register standby
+  command: repmgr -f {{ repmgrd_config }} standby register --force
+  register: repmgr_log
+  become: true
+  become_user: postgres
+  notify:
+    - save repmgr log

@@ -1,0 +1,6 @@
+repmgr_db_user_pass: "changeme"
+repmgrd_service_name: "repmgrd"
+repmgrd_service: "/etc/systemd/system/repmgrd.service"
+repmgrd_bin: "/usr/lib/postgresql/11/bin/repmgrd"
+repmgrd_pid: "/var/run/repmgr/repmgrd.pid"
+repmgrd_config: "/etc/repmgrd.conf"

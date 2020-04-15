@@ -1,0 +1,9 @@
+local replication repmgr md5
+host replication repmgr 127.0.0.1/32 md5
+host replication repmgr {{ hostvars[groups['k3s-nodes'][0]].private_ip }}/32 md5
+host replication repmgr {{ hostvars[groups['k3s-nodes'][1]].private_ip }}/32 md5
+
+local repmgr repmgr md5
+host repmgr repmgr 127.0.0.1/32 md5
+host repmgr repmgr {{ hostvars[groups['k3s-nodes'][0]].private_ip }}/32 md5
+host repmgr repmgr {{ hostvars[groups['k3s-nodes'][1]].private_ip }}/32 md5

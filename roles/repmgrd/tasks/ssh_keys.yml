@@ -1,0 +1,37 @@
+- name: Generate ssh key
+  command: ssh-keygen -b 2048 -t rsa -N "" -C "postgres@{{ inventory_hostname }}" -f ~/.ssh/id_rsa
+  args:
+    creates: "~/.ssh/id_rsa"
+  become: true
+  become_user: postgres
+
+- name: Fetch the public keyfile
+  fetch: 
+    src: "~/.ssh/id_rsa.pub"
+    dest: "keys/{{ inventory_hostname }}-id_rsa.pub"
+    flat: yes
+  become: true
+  become_user: postgres
+
+- name: Copy the file to the destination host
+  copy:
+    src: "keys/{{ hostvars[item]['inventory_hostname'] }}-id_rsa.pub"
+    dest: "/tmp/remote-id_rsa.pub"  
+  when: hostvars[item]['inventory_hostname'] != inventory_hostname
+  with_items: "{{ groups['k3s-nodes'] }}"
+  become: true
+  become_user: postgres
+
+- debug:
+    msg: Running on system {{ inventory_hostname }} and seeing {{ hostvars[item]['inventory_hostname'] }}
+  with_items: "{{ groups['k3s-nodes'] }}"
+
+- name: Ensure user .ssh directory
+  file: dest="~/.ssh" state=directory mode=0700 owner=postgres
+  become: true
+  become_user: postgres
+
+- name: add the public key into authorized_keys
+  shell: "cat /tmp/remote-id_rsa.pub >> ~/.ssh/authorized_keys"
+  become: true
+  become_user: postgres

@@ -1,0 +1,47 @@
+global_defs {
+  router_id {{ inventory_hostname }}
+}
+
+vrrp_script check_port_available {
+    script "/etc/keepalived/check_port_available.sh"
+    interval 5
+    timeout 5
+    fall 3
+    rise 2
+}
+
+vrrp_script check_primary_running {
+    script "/etc/keepalived/check_primary_running.sh {{ inventory_hostname }}"
+    interval 5
+    timeout 10
+    fall 3
+    rise 2
+    user postgres
+}
+
+vrrp_instance postgres-cluster {
+  state BACKUP
+  priority 50
+  # debug 2
+  virtual_router_id 90
+  # nopreempt
+
+  interface {{ keepalived_vrrp_iface }}
+  unicast_src_ip {{ private_ip }}
+  unicast_peer {
+    {{ unicast_peer }}
+  }
+
+  virtual_ipaddress {
+    {{ keepalived_virtual_ip }}
+  }
+
+  track_script {
+    check_primary_running weight 50
+    check_port_available
+  }
+
+  notify_master "/etc/keepalived/notify.sh MASTER"
+  notify_backup "/etc/keepalived/notify.sh BACKUP"
+  notify_fault "/etc/keepalived/notify.sh FAULT"
+}

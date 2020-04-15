@@ -1,0 +1,7 @@
+- hosts: k3s-nodes
+  roles:
+    - {role: 'postgres', tags: 'postgres'}
+    - {role: 'repmgrd', tags: 'repmgrd'}
+    - {role: 'keepalived', tags: 'keepalived'}
+    - {role: 'k3s', tags: 'k3s'}
+  become: yes
